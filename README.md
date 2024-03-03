@@ -5,9 +5,9 @@ only available on Oracle Solaris or Illumos based systems with the 'svccfg' bina
 This program comes with NO SUPPORT and is not intended for deployment in production environments. Use at your own risk.
 
 **Building**
-Run the following commands to clone the repository, enter the directory, and invoke the build script.\n
-`git clone https://github.com/madelinehebert/MDHsvcbundle-go`\n
-`cd MDHsvcbundle-go`\n
-`bash ./build.sh`\n
+Run the following commands to clone the repository, enter the directory, and invoke the build script.
+<br />`git clone https://github.com/madelinehebert/MDHsvcbundle-go`
+<br />`cd MDHsvcbundle-go`
+<br />`bash ./build.sh`
 
 If you are attempting to build this on Windows, just run the contents of the build script in your terminal.
