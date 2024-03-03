@@ -10,3 +10,10 @@ This program comes with NO SUPPORT and is not intended for deployment in product
 <br />`bash ./build.sh`
 
 If you are attempting to build this on Windows, just run the contents of the build script in your terminal.
+
+**Installing pkg release on Illumos**: Run the following commands to download the package release and add it to your system.
+<br /> `wget $LINK_TO_PKG_RELEASE -o $OUTPUT_LOCATION`
+<br /> `pkgadd -d $PATH_TO_OUTPUT_LOCATION`
+
+**Uninstalling pkg release on Illumos**: Run the following command to uninstall this package from your system. (This is assuming you have no moved any installed files.)
+<br /> `pkgrm svcbundle`
