@@ -1,0 +1,14 @@
+ARCH=i386
+CLASSES=none
+BASEDIR=/opt/maddieSoftware
+TZ=EST
+PATH=/sbin:/usr/sbin:/usr/bin
+PKG=svcbundle
+NAME=MDHsvcbundle
+VERSION=1.80
+CATEGORY=system
+DESC=A open source SMF manifest generator.
+VENDOR=Madeline Hebert
+EMAIL=NA
+PKGSAV=/var/sadm/pkg/MDHsvcbundle/save
+PSTAMP=HomeServer20240321135154

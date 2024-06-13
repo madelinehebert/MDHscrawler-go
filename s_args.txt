@@ -1,0 +1,2 @@
+Legal: bundle-type, day, day_of_month, duration, enabled, frequency, hour, instance-name, instance-property, interval, minute, model, month, period, rc-script, refresh-method, service-name, service-property, start-method, stop-method, timezone, week_of_years, weekday_of_month, year
+Implemented: start-method, restart-method, stop-method, service-name, service-description, timeout-seconds

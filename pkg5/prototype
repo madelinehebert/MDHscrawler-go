@@ -1,0 +1,5 @@
+i pkginfo
+i copyright
+!default 0755 root bin
+d none bin ? ? ?
+f none bin/svcbundle=bin/svcbundle
