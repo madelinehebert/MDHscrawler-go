@@ -2,7 +2,7 @@ PKG=svcbundle
 ARCH=i386
 PKGFILE=$PKG-$ARCH.pkg
 DIR="./"
-VERSION="1.80"
+VERSION="1.85"
 
 #replace version
 #sed -i "s;VERSION_NUMBER;$VERSION;g" pkginfo

@@ -14,7 +14,7 @@ import (
 const DTD string = "<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>"
 
 /* Boolean settings */
-const version float32 = 1.80
+const version float32 = 1.85
 
 /* Main */
 func main() {
@@ -33,31 +33,37 @@ func main() {
 
 	//Set general command line args
 	cmd_d_ptr := flag.String("d", "NODEPS", "colon separated dependencies, with substrings separated by '@' symbols")
-	cmd_o_ptr := flag.String("o", "MyService", "specify output file name")
+	cmd_o_ptr := flag.String("o", "MyService.xml", "specify output file name; file extention is automatically added")
 	cmd_q_ptr := flag.Bool("q", false, "suppress output")
 	cmd_s_ptr := flag.String("s", "NOARGS", "colon separated S-args, with substrings separated by '@' symbols")
 	cmd_v_ptr := flag.Bool("v", false, "print program version and exit")
 	cmd_x_ptr := flag.Bool("x", false, "print to stdout")
+	cmd_help_ptr := flag.Bool("?", false, "print the help menu, version, and exit")
 
 	//Parse command line args
 	flag.Parse()
 
-	/*
-		CMD Args:
-		-i : automatically install generated file
-		-o (string) : specify output
-		-q : quiet mode, suppressed output
-		-s (name=value) : specify a name / value pair; needs a list of acceptable values pre-made
-		-V : validate on exit
-		-v : print version and exit
-	*/
+	//Print help menu if needed
+	if *cmd_help_ptr {
+		//Print version header
+		fmt.Printf("svcbundle version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
+		//Help menu goes here
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	//Check version arg
+	if *cmd_v_ptr {
+		fmt.Printf("svcbundle version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
+		os.Exit(0)
+	}
 
 	//Initialize map for -s name/value pairs
 	var s_args map[string]string = make(map[string]string)
 	s_args["start-method"] = ":true"
 	s_args["stop-method"] = ":true"
 	s_args["restart-method"] = ":true"
-	s_args["service-name"] = *cmd_o_ptr
+	s_args["service-name"] = "MyService"
 	s_args["service-description"] = "MyService Description."
 	s_args["timeout-seconds"] = "60"
 
@@ -67,19 +73,15 @@ func main() {
 		args[index] = value
 	}
 
-	//Determine boolean args
-	var output_file string = fmt.Sprintf("./%s.xml", s_args["service-name"])
-	if *cmd_v_ptr {
-		fmt.Printf("svcbundle version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
-		os.Exit(0)
-	}
+	//Set output file name
+	var output_file string = *cmd_o_ptr
 
 	//Check for exclusive args
-	if cmd_i_ptr != nil && *cmd_i_ptr && *cmd_o_ptr != "MyService.xml" {
-		fmt.Println("error: '-i' and '-o' are exclusive arguments!")
-		os.Exit(2)
-	} else if *cmd_q_ptr && *cmd_x_ptr {
+	if *cmd_q_ptr && *cmd_x_ptr {
 		fmt.Println("error: '-q' and '-x' are exclusive arguments!")
+		os.Exit(2)
+	} else if cmd_V_ptr != nil && *cmd_V_ptr && *cmd_x_ptr {
+		fmt.Println("error: '-V' and '-x' are exclusive arguments!")
 		os.Exit(2)
 	}
 
@@ -99,9 +101,9 @@ func main() {
 					} else {
 						s_args[tmpSubstring[0]] = tmpSubstring[1]
 						//Update output file if new service name is provided, will be overwritten if "-o" argument is present
-						if tmpSubstring[0] == "service-name" && *cmd_o_ptr != "MyService.xml" {
-							output_file = fmt.Sprintf("./%s.xml", s_args["service-name"])
-						}
+						//if tmpSubstring[0] == "service-name" && *cmd_o_ptr != "MyService.xml" {
+						//	output_file = fmt.Sprintf("./%s.xml", s_args["service-name"])
+						//}
 						//Determine if quiet mode is enabled or not
 						if !*cmd_q_ptr {
 							fmt.Printf("Setting '%s' to '%s'.\n", tmpSubstring[0], tmpSubstring[1])
@@ -183,7 +185,19 @@ func main() {
 
 		//Validate on exit if -V flag supplied
 		if cmd_V_ptr != nil && *cmd_V_ptr {
-			validate(abspath)
+			if !*cmd_q_ptr {
+				if validate(abspath) {
+					fmt.Println("Validated service manifest!")
+				} else {
+					fmt.Println("Failed to validate service manifest!")
+					os.Exit(4)
+				}
+			} else {
+				if !validate(abspath) {
+					fmt.Println("Failed to validate service manifest!")
+					os.Exit(4)
+				}
+			}
 		}
 	} else {
 		fmt.Println(tmpString)

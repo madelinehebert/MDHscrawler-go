@@ -19,7 +19,7 @@ func validate(abspath string) bool {
 		fmt.Println(err)
 		return false
 	} else if len(strings.Trim(out.String(), "\n")) == 0 {
-		fmt.Println("Validated!")
+		//fmt.Println("Validated!")
 		return true
 	}
 
