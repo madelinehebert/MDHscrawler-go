@@ -46,7 +46,7 @@ func main() {
 	//Print help menu if needed
 	if *cmd_help_ptr {
 		//Print version header
-		fmt.Printf("svcbundle version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
+		fmt.Printf("scrawler version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
 		//Help menu goes here
 		flag.PrintDefaults()
 		os.Exit(0)
@@ -54,7 +54,7 @@ func main() {
 
 	//Check version arg
 	if *cmd_v_ptr {
-		fmt.Printf("svcbundle version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
+		fmt.Printf("scrawler version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
 		os.Exit(0)
 	}
 
@@ -130,8 +130,8 @@ func main() {
 	}
 
 	//Create service_bundle instance and add a service
-	var svcbundle *service_bundle = &service_bundle{Name: s_args["service-name"], Type: "manifest"}
-	svcbundle.Service = add_service(s_args)
+	var scrawler *service_bundle = &service_bundle{Name: s_args["service-name"], Type: "manifest"}
+	scrawler.Service = add_service(s_args)
 
 	//Update dependencies as needed
 	if *cmd_d_ptr != "NODEPS" {
@@ -144,12 +144,12 @@ func main() {
 				//Loop over substrings, then split
 				for i := 0; i < len(tmpString); i++ {
 					tmpSubstring := strings.Split(tmpString[i], "@")
-					svcbundle.Service.Dependency[i] = add_dep(tmpSubstring[0], tmpSubstring[1], tmpSubstring[2], tmpSubstring[3], tmpSubstring[4])
+					scrawler.Service.Dependency[i] = add_dep(tmpSubstring[0], tmpSubstring[1], tmpSubstring[2], tmpSubstring[3], tmpSubstring[4])
 				}
 			} else {
 				//Loop over substrings, then split
 				tmpSubstring := strings.Split(*cmd_d_ptr, "@")
-				svcbundle.Service.Dependency = []*dependency{add_dep(tmpSubstring[0], tmpSubstring[1], tmpSubstring[2], tmpSubstring[3], "svc:"+tmpSubstring[4])}
+				scrawler.Service.Dependency = []*dependency{add_dep(tmpSubstring[0], tmpSubstring[1], tmpSubstring[2], tmpSubstring[3], "svc:"+tmpSubstring[4])}
 			}
 		} else {
 			//Print error and exit
@@ -159,11 +159,11 @@ func main() {
 
 	} else {
 		//Use default service setup - just depend on multi user runlevel
-		svcbundle.Service.Dependency = []*dependency{add_dep("multi_user_dependency", "require_all", "none", "service", "svc:/milestone/multi-user")}
+		scrawler.Service.Dependency = []*dependency{add_dep("multi_user_dependency", "require_all", "none", "service", "svc:/milestone/multi-user")}
 	}
 
 	//Marshall XML
-	out, err := xml.MarshalIndent(svcbundle, " ", "  ")
+	out, err := xml.MarshalIndent(scrawler, " ", "  ")
 	err_check(err)
 	var tmpString string = strings.Replace(string(out), `<loctext xml:lang="C"></loctext>`, `<loctext xml:lang="C">`+s_args["service-name"]+`</loctext>`, 1)
 	tmpString = xml.Header + DTD + generate_timestamp() + strings.Replace(tmpString, `<loctext xml:lang="C"></loctext>`, `<loctext xml:lang="C">`+s_args["service-description"]+`</loctext>`, 1)

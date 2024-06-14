@@ -21,5 +21,5 @@ func generate_timestamp() string {
 	)
 
 	//Return
-	return "\n<!-- Manifest created by svcbundle (" + timestamp + ")-->\n"
+	return "\n<!-- Manifest created by scrawler (" + timestamp + ")-->\n"
 }
