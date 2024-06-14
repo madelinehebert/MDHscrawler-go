@@ -1,4 +1,4 @@
-PKG=svcbundle
+PKG=scrawler
 ARCH=i386
 PKGFILE=$PKG-$ARCH.pkg
 DIR="./"
