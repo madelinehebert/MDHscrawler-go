@@ -2,7 +2,7 @@ PKG=scrawler
 ARCH=i386
 PKGFILE=$PKG-$ARCH.pkg
 DIR="./"
-VERSION="1.85"
+VERSION=`cat pkginfo | grep VERSION | cut -d "=" -f 2`
 
 #replace version
 #sed -i "s;VERSION_NUMBER;$VERSION;g" pkginfo

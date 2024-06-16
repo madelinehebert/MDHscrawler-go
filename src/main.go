@@ -14,7 +14,10 @@ import (
 const DTD string = "<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>"
 
 /* Boolean settings */
-const version float32 = 1.85
+const version float32 = 1.90
+
+/* Other data */
+var INSTALL_DIR string = ""
 
 /* Main */
 func main() {
@@ -36,6 +39,7 @@ func main() {
 	cmd_o_ptr := flag.String("o", "MyService.xml", "specify output file name; file extention is automatically added")
 	cmd_q_ptr := flag.Bool("q", false, "suppress output")
 	cmd_s_ptr := flag.String("s", "NOARGS", "colon separated S-args, with substrings separated by '@' symbols")
+	cmd_S_ptr := flag.Bool("S", false, "generate start and stop scripts for the service, and update those methods")
 	cmd_v_ptr := flag.Bool("v", false, "print program version and exit")
 	cmd_x_ptr := flag.Bool("x", false, "print to stdout")
 	cmd_help_ptr := flag.Bool("?", false, "print the help menu, version, and exit")
@@ -46,7 +50,7 @@ func main() {
 	//Print help menu if needed
 	if *cmd_help_ptr {
 		//Print version header
-		fmt.Printf("scrawler version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
+		printv()
 		//Help menu goes here
 		flag.PrintDefaults()
 		os.Exit(0)
@@ -54,7 +58,7 @@ func main() {
 
 	//Check version arg
 	if *cmd_v_ptr {
-		fmt.Printf("scrawler version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
+		printv()
 		os.Exit(0)
 	}
 
@@ -99,11 +103,14 @@ func main() {
 						fmt.Println("BAD KEY: " + tmpSubstring[1])
 						os.Exit(1)
 					} else {
+						//Check if -S is set, meaning ignore manually supplied start and stop methods
+						if *cmd_S_ptr && (tmpSubstring[0] == "start-method" || tmpSubstring[0] == "stop-method") {
+							if !*cmd_q_ptr {
+								fmt.Println("Ignoring Start and Stop methods; -S is set to true.")
+							}
+							continue
+						}
 						s_args[tmpSubstring[0]] = tmpSubstring[1]
-						//Update output file if new service name is provided, will be overwritten if "-o" argument is present
-						//if tmpSubstring[0] == "service-name" && *cmd_o_ptr != "MyService.xml" {
-						//	output_file = fmt.Sprintf("./%s.xml", s_args["service-name"])
-						//}
 						//Determine if quiet mode is enabled or not
 						if !*cmd_q_ptr {
 							fmt.Printf("Setting '%s' to '%s'.\n", tmpSubstring[0], tmpSubstring[1])
@@ -123,10 +130,23 @@ func main() {
 
 	//Update filepath if autoinstall is true
 	if cmd_i_ptr != nil && *cmd_i_ptr {
-		output_file = "/lib/svc/manifest/system/" + output_file
+		INSTALL_DIR = "/lib/svc/manifest/system/"
+		output_file = INSTALL_DIR + output_file
 		if !*cmd_q_ptr {
 			fmt.Println("Set program to automatically install manifest after completion.")
 		}
+	}
+
+	//Check if scripts should be generated
+	if *cmd_S_ptr {
+		//Generate scripts
+		if err := generate_scripts(INSTALL_DIR, s_args["service-name"]); err != nil {
+			fmt.Println(err)
+			os.Exit(5)
+		}
+		//Update start and stop methods
+		s_args["start-method"] = fmt.Sprintf("%sStart_%s.sh", INSTALL_DIR, s_args["service-name"])
+		s_args["stop-method"] = fmt.Sprintf("%sStop_%s.sh", INSTALL_DIR, s_args["service-name"])
 	}
 
 	//Create service_bundle instance and add a service
@@ -147,7 +167,7 @@ func main() {
 					scrawler.Service.Dependency[i] = add_dep(tmpSubstring[0], tmpSubstring[1], tmpSubstring[2], tmpSubstring[3], tmpSubstring[4])
 				}
 			} else {
-				//Loop over substrings, then split
+				//Make an array out of the lone pair provided
 				tmpSubstring := strings.Split(*cmd_d_ptr, "@")
 				scrawler.Service.Dependency = []*dependency{add_dep(tmpSubstring[0], tmpSubstring[1], tmpSubstring[2], tmpSubstring[3], "svc:"+tmpSubstring[4])}
 			}
@@ -156,7 +176,6 @@ func main() {
 			fmt.Println("Substring path separator not found.")
 			os.Exit(3)
 		}
-
 	} else {
 		//Use default service setup - just depend on multi user runlevel
 		scrawler.Service.Dependency = []*dependency{add_dep("multi_user_dependency", "require_all", "none", "service", "svc:/milestone/multi-user")}
