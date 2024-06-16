@@ -14,7 +14,7 @@ import (
 const DTD string = "<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>"
 
 /* Boolean settings */
-const version float32 = 1.90
+const version float32 = 1.91
 
 /* Other data */
 var INSTALL_DIR string = "./"
