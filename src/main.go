@@ -14,10 +14,11 @@ import (
 const DTD string = "<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>"
 
 /* Boolean settings */
-const version float32 = 1.91
+const version float32 = 1.93
 
 /* Other data */
-var INSTALL_DIR string = "./"
+var INSTALL_DIR string = "./" //Autoinstallation dir; set to the dir the program is running from by default
+var SVCBIN string = "SVCBIN"  //Binary to be called in start and stop scripts; inherited from -b arg
 
 /* Main */
 func main() {
@@ -35,6 +36,7 @@ func main() {
 	}
 
 	//Set general command line args
+	cmd_b_ptr := flag.String("b", "SVCBIN", "binary and options to run as a service")
 	cmd_d_ptr := flag.String("d", "NODEPS", "colon separated dependencies, with substrings separated by '@' symbols")
 	cmd_o_ptr := flag.String("o", "MyService.xml", "specify output file name; file extention is automatically added")
 	cmd_q_ptr := flag.Bool("q", false, "suppress output")
@@ -50,7 +52,7 @@ func main() {
 	//Print help menu if needed
 	if *cmd_help_ptr {
 		//Print version header
-		printv()
+		printV()
 		//Help menu goes here
 		flag.PrintDefaults()
 		os.Exit(0)
@@ -58,9 +60,12 @@ func main() {
 
 	//Check version arg
 	if *cmd_v_ptr {
-		printv()
+		printV()
 		os.Exit(0)
 	}
+
+	//Update SVCBIN
+	SVCBIN = *cmd_b_ptr
 
 	//Initialize map for -s name/value pairs
 	var s_args map[string]string = make(map[string]string)
@@ -106,7 +111,7 @@ func main() {
 						//Check if -S is set, meaning ignore manually supplied start and stop methods
 						if *cmd_S_ptr && (tmpSubstring[0] == "start-method" || tmpSubstring[0] == "stop-method") {
 							if !*cmd_q_ptr {
-								fmt.Println("Ignoring Start and Stop methods; -S is set to true.")
+								fmt.Println("Ignoring provided Start and Stop methods; -S is set to true.\nStart and Stop methods can only be set manually when autogeneration of scripts is set to false.")
 							}
 							continue
 						}

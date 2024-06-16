@@ -6,6 +6,6 @@ import (
 )
 
 // Function to print program version
-func printv() {
+func printV() {
 	fmt.Printf("scrawler version %.2f %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
 }

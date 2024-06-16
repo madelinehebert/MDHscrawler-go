@@ -4,13 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 )
 
-const START string = "#! /usr/bin/bash\nnohup SVCBIN &"
-const STOP string = "#! /usr/bin/bash\nkill -9 `pgrep SVCBIN`"
-
+// Function to auto-generate start and stop method scripts
 func generate_scripts(install_location string, name string) error {
-	fmt.Println(install_location)
+	//Set start and stop code
+	var START string = fmt.Sprintf("#! /usr/bin/bash\nnohup %s &", SVCBIN)
+	var STOP string = fmt.Sprintf("#! /usr/bin/bash\nkill -9 `pgrep %s`", strings.Split(SVCBIN, " ")[0])
+
 	//Generate start.sh file
 	startFile, err := os.Create(fmt.Sprintf("%sStart_%s.sh", install_location, name))
 	if err != nil {
