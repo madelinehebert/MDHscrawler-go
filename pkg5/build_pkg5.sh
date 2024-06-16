@@ -4,9 +4,10 @@ PKGFILE=$PKG-$ARCH.pkg
 DIR="./"
 VERSION=`cat pkginfo | grep VERSION | cut -d "=" -f 2`
 
-#replace version
-#sed -i "s;VERSION_NUMBER;$VERSION;g" pkginfo
+#remove old package
+rm -rf scrawler*
 
+#
 pkgmk -o -d $DIR -a $ARCH
 touch $PKGFILE
 pkgtrans -s $DIR $PKGFILE $PKG 

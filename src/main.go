@@ -17,7 +17,7 @@ const DTD string = "<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/serv
 const version float32 = 1.90
 
 /* Other data */
-var INSTALL_DIR string = ""
+var INSTALL_DIR string = "./"
 
 /* Main */
 func main() {

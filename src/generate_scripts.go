@@ -10,6 +10,7 @@ const START string = "#! /usr/bin/bash\nnohup SVCBIN &"
 const STOP string = "#! /usr/bin/bash\nkill -9 `pgrep SVCBIN`"
 
 func generate_scripts(install_location string, name string) error {
+	fmt.Println(install_location)
 	//Generate start.sh file
 	startFile, err := os.Create(fmt.Sprintf("%sStart_%s.sh", install_location, name))
 	if err != nil {
