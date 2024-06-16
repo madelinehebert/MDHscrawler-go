@@ -1,0 +1,26 @@
+_scrawler()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    
+    if [ `uname` == "SunOS" ];
+    then
+        dash_opts="-b -d -i -o -q -s -S -v -V -x -?"
+    else
+        dash_opts="-b -d -o -q -s -S -v -x -?"
+    fi
+    
+    #If arg is preceeded by -
+    if [[ ${cur} == -* ]];
+    then
+        COMPREPLY=( $(compgen -W "${dash_opts}" -- ${cur}) )
+        return 0
+    fi
+}
+
+# `foo` <tab> <tab> would show autocomplete above wordlist 
+complete -F _scrawler scrawler
+# If you want simplest wordlist, use below instead:
+#complete -W "--help --verbose --version" foo
